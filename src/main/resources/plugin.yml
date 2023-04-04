@@ -1,0 +1,8 @@
+name: RandomTP
+main: net.okocraft.randomtp.RandomTPPlugin
+version: ${project.version}
+folia-supported: true
+api-version: 1.19
+commands:
+  rtp:
+    default: true
