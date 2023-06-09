@@ -82,6 +82,8 @@ public class RandomTPPlugin extends JavaPlugin {
     }
 
     private void startRandomTeleport(@NotNull Player player, @NotNull World world) {
+        player.sendMessage(translatable("randomtp.generating-random-location", GRAY));
+
         int maxAttempts = 30;
         int attempts = 0;
         var random = new Random();

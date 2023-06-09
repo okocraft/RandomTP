@@ -49,11 +49,19 @@ public class CountdownTask implements Runnable, Listener {
     public void run() {
         if (cancelled.get()) {
             PLAYERS.remove(player.getUniqueId());
+            finishTask();
+            return;
+        }
+
+        if (!player.getWorld().equals(location.getWorld())) {
+            cancelled.set(true);
+            player.sendMessage(translatable("randomtp.cancelled-due-to-change-world", RED));
+            finishTask();
             return;
         }
 
         if (remaining < 1) {
-            PLAYERS.remove(player.getUniqueId());
+            finishTask();
 
             player.teleportAsync(location).thenAcceptAsync(success -> {
                 if (success) {
@@ -87,7 +95,7 @@ public class CountdownTask implements Runnable, Listener {
                 Math.round(loc1.getZ()) != Math.round(loc2.getZ())) {
             cancelled.set(true);
             player.sendMessage(Component.translatable("randomtp.cancelled-due-to-move", RED));
-            HandlerList.unregisterAll(this);
+            finishTask();
         }
     }
 
@@ -97,5 +105,10 @@ public class CountdownTask implements Runnable, Listener {
         } else {
             this.onTeleport = playerConsumer;
         }
+    }
+
+    private void finishTask() {
+        PLAYERS.remove(player.getUniqueId());
+        HandlerList.unregisterAll(this);
     }
 }
