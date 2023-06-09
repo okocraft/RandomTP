@@ -1,5 +1,6 @@
 package net.okocraft.randomtp;
 
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -9,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 final class LocationGenerator {
 
@@ -20,48 +20,50 @@ final class LocationGenerator {
             Material.END_PORTAL, Material.NETHER_PORTAL
     );
 
-    public static @NotNull CompletableFuture<@Nullable Location> generateSafeLocation(@NotNull World world, @NotNull Random random) {
+    public static @Nullable Location generateSafeLocation(@NotNull World world, @NotNull Random random) {
         int worldBorderRadius = ((int) world.getWorldBorder().getSize()) >> 1;
+
         int x = (random.nextBoolean() ? -1 : 1) * random.nextInt(worldBorderRadius);
         int z = (random.nextBoolean() ? -1 : 1) * random.nextInt(worldBorderRadius);
 
-        return CompletableFuture.supplyAsync(
-                () -> {
-                    var loc = createLocationWithSafeY(world, x, z);
-                    return loc != null && isLocationSafe(loc) ? loc : null;
-                },
-                Scheduler.getRegionExecutor(world, x, z)
+        var chunk = world.getChunkAtAsync(x >> 4, z >> 4).thenApply(c -> c.getChunkSnapshot(true, false, false)).join();
+
+        int y = createSafeY(
+                chunk,
+                world.getEnvironment() == World.Environment.NETHER,
+                Math.abs(x % 16),
+                Math.abs(z % 16),
+                world.getMinHeight(), world.getMaxHeight()
         );
+
+        return y != Integer.MIN_VALUE ? new Location(world, x, y, z) : null;
     }
 
-    private static @Nullable Location createLocationWithSafeY(@NotNull World world, int x, int z) {
-        int y;
-
-        if (world.getEnvironment() == World.Environment.NETHER) {
-            y = getSafeYInNether(world, x, z);
-        } else {
-            y = getHighestY(world, x, z);
-        }
-
-        if (y == Integer.MIN_VALUE) { // No safe location in nether
-            return null;
-        }
-
-        return new Location(world, x, y, z);
+    private static int createSafeY(@NotNull ChunkSnapshot chunk, boolean isNether, int blockX, int blockZ, int minY, int maxY) {
+        return isNether ?
+                getSafeYInNether(chunk, blockX, blockZ) :
+                getSafeHighestY(chunk, blockX, blockZ, minY, maxY);
     }
 
-    private static boolean isLocationSafe(@NotNull Location location) {
-        return isLocationSafe(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    private static int getSafeHighestY(ChunkSnapshot chunk, int blockX, int blockZ, int minY, int maxY) {
+        int y = chunk.getHighestBlockYAt(blockX, blockZ) + 1;
+        return y != minY && y != maxY && isLocationSafe(chunk, blockX, y, blockZ) ? y : Integer.MIN_VALUE;
     }
 
-    private static boolean isLocationSafe(@NotNull World world, int x, int y, int z) {
-        if (!world.isChunkGenerated(x >> 4, z >> 4)) {
-            return false;
+    private static int getSafeYInNether(ChunkSnapshot chunk, int blockX, int blockZ) {
+        for (int y = 32; y < 100; y++) { // y < 32 can be lava, and 100 < y is basically a ceiling
+            if (isLocationSafe(chunk, blockX, y, blockZ)) {
+                return y;
+            }
         }
 
-        var block = world.getBlockAt(x, y, z).getType();
-        var below = world.getBlockAt(x, y - 1, z).getType();
-        var above = world.getBlockAt(x, y + 1, z).getType();
+        return Integer.MIN_VALUE;
+    }
+
+    private static boolean isLocationSafe(@NotNull ChunkSnapshot chunk, int blockX, int y, int blockZ) {
+        var block = chunk.getBlockType(blockX, y, blockZ);
+        var below = chunk.getBlockType(blockX, y - 1, blockZ);
+        var above = chunk.getBlockType(blockX, y + 1, blockZ);
 
         // overworld or the end
         return !BAD_BLOCKS.contains(above)
@@ -70,20 +72,6 @@ final class LocationGenerator {
                 && !above.isSolid()
                 && !block.isSolid()
                 && below.isSolid();
-    }
-
-    private static int getHighestY(World world, int x, int z) {
-        return world.getHighestBlockYAt(x, z) + 1;
-    }
-
-    private static int getSafeYInNether(World world, int x, int z) {
-        for (int y = 32; y < 100; y++) { // y < 32 can be lava, and 100 < y is basically a ceiling
-            if (isLocationSafe(world, x, y, z)) {
-                return y;
-            }
-        }
-
-        return Integer.MIN_VALUE;
     }
 
     private LocationGenerator() {

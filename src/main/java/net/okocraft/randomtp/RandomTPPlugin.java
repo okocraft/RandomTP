@@ -89,7 +89,7 @@ public class RandomTPPlugin extends JavaPlugin {
         Location safeLocation = null;
 
         while (attempts < maxAttempts) {
-            safeLocation = LocationGenerator.generateSafeLocation(world, random).join();
+            safeLocation = LocationGenerator.generateSafeLocation(world, random);
 
             if (safeLocation != null) {
                 break;
