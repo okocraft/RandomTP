@@ -55,7 +55,7 @@ public class CountdownTask implements Runnable, Listener {
         if (remaining < 1) {
             PLAYERS.remove(player.getUniqueId());
 
-            player.teleportAsync(location).thenAccept(success -> {
+            player.teleportAsync(location).thenAcceptAsync(success -> {
                 if (success) {
                     if (onTeleport != null) {
                         Scheduler.runOnPlayerScheduler(player, onTeleport);
