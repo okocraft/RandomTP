@@ -47,7 +47,7 @@ final class LocationGenerator {
 
     private static int getSafeHighestY(ChunkSnapshot chunk, int blockX, int blockZ, int minY, int maxY) {
         int y = chunk.getHighestBlockYAt(blockX, blockZ) + 1;
-        return y != minY && y != maxY && isLocationSafe(chunk, blockX, y, blockZ) ? y : Integer.MIN_VALUE;
+        return y != minY && y + 1 != maxY && isLocationSafe(chunk, blockX, y, blockZ) ? y : Integer.MIN_VALUE;
     }
 
     private static int getSafeYInNether(ChunkSnapshot chunk, int blockX, int blockZ) {
