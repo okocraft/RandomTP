@@ -31,8 +31,8 @@ final class LocationGenerator {
         int y = createSafeY(
                 chunk,
                 world.getEnvironment() == World.Environment.NETHER,
-                Math.abs(x % 16),
-                Math.abs(z % 16),
+                x & 0xF,
+                z & 0xF,
                 world.getMinHeight(), world.getMaxHeight()
         );
 
