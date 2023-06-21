@@ -40,7 +40,7 @@ public class CountdownTask implements Runnable, Listener {
     public CountdownTask(@NotNull Player player, @NotNull Location location, int start) {
         this.player = player;
         this.location = location;
-        this.remaining = start;
+        this.remaining = start + 1;
 
         PLAYERS.add(player.getUniqueId());
     }
@@ -60,6 +60,8 @@ public class CountdownTask implements Runnable, Listener {
             return;
         }
 
+        remaining--;
+
         if (remaining < 1) {
             finishTask();
 
@@ -75,7 +77,6 @@ public class CountdownTask implements Runnable, Listener {
         } else {
             var seconds = translatable().key("randomtp.seconds").args(text(remaining)).color(AQUA);
             player.sendMessage(Component.translatable().key("randomtp.countdown").args(seconds).color(GRAY));
-            remaining--;
 
             Scheduler.runAsyncAfterOneSecond(this);
         }
