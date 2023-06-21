@@ -61,17 +61,13 @@ final class LocationGenerator {
     }
 
     private static boolean isLocationSafe(@NotNull ChunkSnapshot chunk, int blockX, int y, int blockZ) {
-        var block = chunk.getBlockType(blockX, y, blockZ);
-        var below = chunk.getBlockType(blockX, y - 1, blockZ);
-        var above = chunk.getBlockType(blockX, y + 1, blockZ);
+        var floor = chunk.getBlockType(blockX, y - 1, blockZ);
 
-        // overworld or the end
-        return !BAD_BLOCKS.contains(above)
-                && !BAD_BLOCKS.contains(block)
-                && !BAD_BLOCKS.contains(below)
-                && !above.isSolid()
-                && !block.isSolid()
-                && below.isSolid();
+        if (!floor.isSolid() || BAD_BLOCKS.contains(floor)) {
+            return false;
+        }
+
+        return chunk.getBlockType(blockX, y, blockZ).isAir() && chunk.getBlockType(blockX, y + 1, blockZ).isAir();
     }
 
     private LocationGenerator() {
