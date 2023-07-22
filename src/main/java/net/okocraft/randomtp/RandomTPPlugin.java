@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +30,8 @@ import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
 public class RandomTPPlugin extends JavaPlugin {
+
+    private static final UUID NEXT_CLEANUP_UUID = new UUID(0, 0);
 
     private static final PotionEffect INVINCIBILITY = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 3);
     private final TranslationRegistry translationRegistry = BuiltinTranslations.createRegistry();
@@ -74,6 +77,12 @@ public class RandomTPPlugin extends JavaPlugin {
             return true;
         }
 
+        var nextCleanup = cooldownMap.get(NEXT_CLEANUP_UUID);
+
+        if (nextCleanup != null && Duration.between(Instant.now(), nextCleanup).isNegative()) {
+            cleanupCooldownMap();
+        }
+
         var world = player.getWorld();
 
         Scheduler.runAsync(() -> startRandomTeleport(player, world));
@@ -116,7 +125,9 @@ public class RandomTPPlugin extends JavaPlugin {
 
     private void startCooldown(@NotNull Player player) {
         if (!player.hasPermission("randomtp.bypass-cooldown")) {
-            cooldownMap.put(player.getUniqueId(), Instant.now().plusSeconds(300));
+            var cooldown = Instant.now().plusSeconds(300);
+            cooldownMap.put(player.getUniqueId(), cooldown);
+            cooldownMap.putIfAbsent(NEXT_CLEANUP_UUID, cooldown);
         }
     }
 
@@ -125,5 +136,15 @@ public class RandomTPPlugin extends JavaPlugin {
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1.0f, 1.0f);
         player.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation(), 1);
         player.addPotionEffect(INVINCIBILITY);
+    }
+
+    private void cleanupCooldownMap() {
+        var now = Instant.now();
+        for (var uuid : Set.copyOf(cooldownMap.keySet())) {
+            var cooldown = cooldownMap.get(uuid);
+            if (cooldown != null && Duration.between(now, cooldown).isNegative()) {
+                cooldownMap.remove(uuid);
+            }
+        }
     }
 }
