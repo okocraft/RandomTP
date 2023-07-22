@@ -59,7 +59,7 @@ public class RandomTPPlugin extends JavaPlugin {
 
         var cooldown = cooldownMap.get(player.getUniqueId());
 
-        if (cooldown != null) {
+        if (cooldown != null && !sender.hasPermission("randomtp.bypass-cooldown")) {
             var left = Duration.between(Instant.now(), cooldown);
 
             if (!(left.isNegative() || left.isZero())) {
