@@ -61,6 +61,7 @@
                         </manifest>
                         <manifestEntries>
                             <Automatic-Module-Name>net.okocraft.randomtp</Automatic-Module-Name>
+                            <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
                         </manifestEntries>
                     </archive>
                 </configuration>
