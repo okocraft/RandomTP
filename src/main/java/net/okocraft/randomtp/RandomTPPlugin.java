@@ -1,7 +1,7 @@
 package net.okocraft.randomtp;
 
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.kyori.adventure.translation.TranslationRegistry;
+import net.kyori.adventure.translation.TranslationStore;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class RandomTPPlugin extends JavaPlugin {
     private static final UUID NEXT_CLEANUP_UUID = new UUID(0, 0);
 
     private static final PotionEffect INVINCIBILITY = new PotionEffect(PotionEffectType.RESISTANCE, 100, 3);
-    private final TranslationRegistry translationRegistry = BuiltinTranslations.createRegistry();
+    private final TranslationStore<MessageFormat> translationRegistry = BuiltinTranslations.createRegistry();
 
     private final Map<UUID, Instant> cooldownMap = new ConcurrentHashMap<>();
 
@@ -53,14 +54,14 @@ public class RandomTPPlugin extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(translatable("randomtp.command.not-player", RED));
             return true;
         }
 
         if (!sender.hasPermission("randomtp.self")) {
-            sender.sendMessage(translatable().key("randomtp.no-permission").args(text("randomtp.self", AQUA)).color(RED));
+            sender.sendMessage(translatable().key("randomtp.no-permission").arguments(text("randomtp.self", AQUA)).color(RED));
             return true;
         }
 
@@ -70,8 +71,8 @@ public class RandomTPPlugin extends JavaPlugin {
             var left = Duration.between(Instant.now(), cooldown);
 
             if (!(left.isNegative() || left.isZero())) {
-                var remaining = translatable().key("randomtp.seconds").args(text(left.toSeconds())).color(AQUA);
-                sender.sendMessage(translatable().key("randomtp.in-cooldown").args(remaining).color(GRAY));
+                var remaining = translatable().key("randomtp.seconds").arguments(text(left.toSeconds())).color(AQUA);
+                sender.sendMessage(translatable().key("randomtp.in-cooldown").arguments(remaining).color(GRAY));
                 return true;
             }
         }

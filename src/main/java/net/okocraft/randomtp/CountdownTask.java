@@ -76,8 +76,8 @@ public class CountdownTask implements Runnable, Listener {
                 }
             });
         } else {
-            var seconds = translatable().key("randomtp.seconds").args(text(remaining)).color(AQUA);
-            player.sendMessage(Component.translatable().key("randomtp.countdown").args(seconds).color(GRAY));
+            var seconds = translatable().key("randomtp.seconds").arguments(text(remaining)).color(AQUA);
+            player.sendMessage(Component.translatable().key("randomtp.countdown").arguments(seconds).color(GRAY));
 
             this.player.getServer().getAsyncScheduler().runDelayed(RandomTPPlugin.getPlugin(), ignored -> this.run(), 1, TimeUnit.SECONDS);
         }

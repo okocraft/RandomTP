@@ -2,7 +2,7 @@ package net.okocraft.randomtp;
 
 import com.google.common.collect.ImmutableMap;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.translation.TranslationRegistry;
+import net.kyori.adventure.translation.TranslationStore;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
@@ -11,8 +11,8 @@ import java.util.Map;
 
 final class BuiltinTranslations {
 
-    public static @NotNull TranslationRegistry createRegistry() {
-        var registry = TranslationRegistry.create(Key.key("randomtp", "languages"));
+    public static @NotNull TranslationStore<MessageFormat> createRegistry() {
+        var registry = TranslationStore.messageFormat(Key.key("randomtp", "languages"));
 
         registry.registerAll(Locale.ENGLISH, en());
         registry.registerAll(Locale.JAPAN, jp());
