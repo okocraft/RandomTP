@@ -33,7 +33,7 @@ public class RandomTPPlugin extends JavaPlugin {
 
     private static final UUID NEXT_CLEANUP_UUID = new UUID(0, 0);
 
-    private static final PotionEffect INVINCIBILITY = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 3);
+    private static final PotionEffect INVINCIBILITY = new PotionEffect(PotionEffectType.RESISTANCE, 100, 3);
     private final TranslationRegistry translationRegistry = BuiltinTranslations.createRegistry();
 
     private final Map<UUID, Instant> cooldownMap = new ConcurrentHashMap<>();
@@ -134,7 +134,7 @@ public class RandomTPPlugin extends JavaPlugin {
     private void playTeleportEffect(@NotNull Player player) {
         player.sendMessage(translatable("randomtp.teleported", GRAY));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1.0f, 1.0f);
-        player.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation(), 1);
+        player.spawnParticle(Particle.FIREWORK, player.getLocation(), 1);
         player.addPotionEffect(INVINCIBILITY);
     }
 

@@ -2,7 +2,13 @@ name: Java CI
 on: [ push, pull_request ]
 
 jobs:
-  build-java-17:
+  build-java-21:
     uses: okocraft/workflows/.github/workflows/maven.yml@v1
     with:
-      java-version: '17'
+      java-version: '21'
+      package-name: RandomTP-Build-${{ github.run_number }}
+  build-java-25:
+    uses: okocraft/workflows/.github/workflows/maven.yml@v1
+    with:
+      java-version: '25'
+      package-name: RandomTP-Build-${{ github.run_number }}
