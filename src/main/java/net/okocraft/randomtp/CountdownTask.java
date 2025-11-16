@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -67,8 +68,8 @@ public class CountdownTask implements Runnable, Listener {
 
             player.teleportAsync(location).thenAcceptAsync(success -> {
                 if (success) {
-                    if (onTeleport != null) {
-                        Scheduler.runOnPlayerScheduler(player, onTeleport);
+                    if (this.onTeleport != null) {
+                        this.player.getScheduler().run(RandomTPPlugin.getPlugin(), ignored -> this.onTeleport.accept(player), null);
                     }
                 } else {
                     player.sendMessage(translatable("randomtp.cannot-teleport", RED));
@@ -78,7 +79,7 @@ public class CountdownTask implements Runnable, Listener {
             var seconds = translatable().key("randomtp.seconds").args(text(remaining)).color(AQUA);
             player.sendMessage(Component.translatable().key("randomtp.countdown").args(seconds).color(GRAY));
 
-            Scheduler.runAsyncAfterOneSecond(this);
+            this.player.getServer().getAsyncScheduler().runDelayed(RandomTPPlugin.getPlugin(), ignored -> this.run(), 1, TimeUnit.SECONDS);
         }
     }
 
@@ -92,8 +93,8 @@ public class CountdownTask implements Runnable, Listener {
         Location loc2 = event.getTo();
 
         if (Math.round(loc1.getX()) != Math.round(loc2.getX()) ||
-                Math.round(loc1.getY()) != Math.round(loc2.getY()) ||
-                Math.round(loc1.getZ()) != Math.round(loc2.getZ())) {
+            Math.round(loc1.getY()) != Math.round(loc2.getY()) ||
+            Math.round(loc1.getZ()) != Math.round(loc2.getZ())) {
             cancelled.set(true);
             player.sendMessage(Component.translatable("randomtp.cancelled-due-to-move", RED));
             finishTask();

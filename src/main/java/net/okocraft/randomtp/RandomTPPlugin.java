@@ -31,6 +31,10 @@ import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
 public class RandomTPPlugin extends JavaPlugin {
 
+    public static @NotNull RandomTPPlugin getPlugin() {
+        return JavaPlugin.getPlugin(RandomTPPlugin.class);
+    }
+
     private static final UUID NEXT_CLEANUP_UUID = new UUID(0, 0);
 
     private static final PotionEffect INVINCIBILITY = new PotionEffect(PotionEffectType.RESISTANCE, 100, 3);
@@ -85,7 +89,7 @@ public class RandomTPPlugin extends JavaPlugin {
 
         var world = player.getWorld();
 
-        Scheduler.runAsync(() -> startRandomTeleport(player, world));
+        this.getServer().getAsyncScheduler().runNow(this, ignored -> this.startRandomTeleport(player, world));
 
         return true;
     }
@@ -120,7 +124,7 @@ public class RandomTPPlugin extends JavaPlugin {
         task.onTeleport(this::playTeleportEffect);
 
         getServer().getPluginManager().registerEvents(task, this);
-        Scheduler.runAsync(task);
+        this.getServer().getAsyncScheduler().runNow(this, ignored -> task.run());
     }
 
     private void startCooldown(@NotNull Player player) {
