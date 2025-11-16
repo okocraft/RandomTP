@@ -2,6 +2,11 @@
 
 A Paper/Folia plugin that teleports the player to the random location.
 
+## Requirements
+
+- Java 21+
+- Paper / Folia 1.21.5+
+
 ## Command
 
 - `/rtp` - Teleports to the random location
