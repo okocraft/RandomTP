@@ -1,6 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    'github>okocraft/renovate-config//github-actions/renovate.json5',
+    'github>okocraft/renovate-config//java/maven/renovate.json5',
+    'github>okocraft/renovate-config//java/ignores/papermc/renovate.json5'
   ]
 }
