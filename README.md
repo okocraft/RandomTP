@@ -4,7 +4,7 @@ A Paper/Folia plugin that teleports the player to the random location.
 
 ## Requirements
 
-- Java 21+
+- Java 25+
 - Paper / Folia 1.21.5+
 
 ## Command
@@ -18,7 +18,7 @@ A Paper/Folia plugin that teleports the player to the random location.
 
 ## Build from source
 
-You need to prepare Java 21 and Maven.
+You need to prepare Java 25 and Maven.
 
 Run `mvn package` and the plugin jar will be generated under `target` directory
 
@@ -26,4 +26,4 @@ Run `mvn package` and the plugin jar will be generated under `target` directory
 
 This project is under the GPL-3.0 license. Please see [LICENSE](LICENSE) for more info.
 
-Copyright © 2023-2025, OKOCRAFT
+Copyright © 2023-2026, OKOCRAFT
